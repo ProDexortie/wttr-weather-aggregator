@@ -33,10 +33,32 @@ def fetch_weather(city: str) -> WeatherData:
     return WeatherData(city=city, temperature=temperature, country=country)
 
 
-def format_temperature(temp: int) -> str:
-    if temp > 0:
-        return f"+{temp} °C"
-    return f"{temp} °C"
+def format_temperature(temp: float) -> str:
+    temp_val = round(temp)
+    if temp_val > 0:
+        return f"+{temp_val} °C"
+    return f"{temp_val} °C"
+
+
+def print_country_statistics(weather_list: list[WeatherData]) -> None:
+    countries = {}
+    for item in weather_list:
+        countries.setdefault(item.country, []).append(item)
+
+    for country, items in countries.items():
+        count = len(items)
+        temps = [item.temperature for item in items]
+        avg_temp = round(sum(temps) / count)
+        min_temp = min(temps)
+        max_temp = max(temps)
+        cities_label = "city" if count == 1 else "cities"
+
+        print(
+            f"{country} — {count} {cities_label}, "
+            f"avg: {format_temperature(avg_temp)}, "
+            f"min: {format_temperature(min_temp)}, "
+            f"max: {format_temperature(max_temp)}"
+        )
 
 
 def main():
@@ -50,6 +72,10 @@ def main():
             print(f"{weather.city}, {weather.country} {format_temperature(weather.temperature)}")
         except Exception as e:
             print(f"Ошибка получения погоды для {city}: {e}")
+
+    if weather_list:
+        print()
+        print_country_statistics(weather_list)
 
 
 if __name__ == "__main__":
